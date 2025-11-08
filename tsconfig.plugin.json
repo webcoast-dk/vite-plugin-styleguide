@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "outDir": "dist/plugin",
+        "rootDir": "src/plugin",
+        "declaration": true,
+        "module": "ESNext",
+        "target": "ES2022",
+        "moduleResolution": "bundler",
+        "esModuleInterop": true,
+        "strict": true,
+    },
+    "include": ["src/plugin/**/*.ts"],
+}
