@@ -1,6 +1,6 @@
 import { Plugin } from 'vite'
 import express from 'express'
-import * as path from 'path';
+import * as path from 'path'
 import type { PluginOptions } from '../../types/plugin'
 import type { NextHandleFunction } from 'connect'
 import { spaMiddleware } from './middleware/spaMiddleware.js'
@@ -19,32 +19,31 @@ export default function styleguidePlugin(options: PluginOptions): Plugin {
         name: 'vite-plugin-styleguide',
         configureServer(server) {
             // Serve API with component structure
-            server.middlewares.use('/api/components', apiMiddleware(options.componentsBasePath) );
+            server.middlewares.use('/api/components', apiMiddleware(options.componentsBasePath))
 
             server.middlewares.use('/api/websocket', (req, res) => {
                 res.writeHead(200, {
-                    'Content-Type': 'application/json',
-                });
+                    'Content-Type': 'application/json'
+                })
                 res.end(JSON.stringify({
                     token: server.config.webSocketToken
-                }));
+                }))
             })
 
-            server.middlewares.use('/render/', renderMiddleware(options.componentsBasePath));
+            server.middlewares.use('/render/', renderMiddleware(options.componentsBasePath, options.nunjucks))
 
-            server.middlewares.use('/', spaMiddleware(distDir));
+            server.middlewares.use('/', spaMiddleware(distDir))
 
             // Serve static files (JS, CSS, assets)
             const staticMiddleware = express.static(distDir)
             server.middlewares.use(staticMiddleware as NextHandleFunction)
 
             // SPA fallback: serve index.html for all other routes
-            server.middlewares.use(spaMiddleware(distDir));
+            server.middlewares.use(spaMiddleware(distDir))
 
             // Configure watcher to watch for changes in the components directory
             server.watcher.add(path.join(options.componentsBasePath, '**', '*.njk'))
             server.watcher.on('add', filePath => {
-                console.log(`Component added: ${filePath}`)
                 if (filePath.endsWith('.njk') && !path.relative(path.join(process.cwd(), options.componentsBasePath), filePath).startsWith('..')) {
                     server.ws.send({
                         type: 'custom',
@@ -56,7 +55,6 @@ export default function styleguidePlugin(options: PluginOptions): Plugin {
                 }
             })
             server.watcher.on('unlink', filePath => {
-                console.log(`Component removed: ${filePath}`)
                 if (filePath.endsWith('.njk') && !path.relative(path.join(process.cwd(), options.componentsBasePath), filePath).startsWith('..')) {
                     server.ws.send({
                         type: 'custom',
@@ -68,13 +66,13 @@ export default function styleguidePlugin(options: PluginOptions): Plugin {
                 }
             })
             server.watcher.on('change', (filePath) => {
-                if (filePath.endsWith('.njk') && !path.relative(path.join(process.cwd(), options.componentsBasePath), filePath).startsWith('..')) {
+                if ((filePath.endsWith('.njk') || filePath.endsWith('.config.json')) && !path.relative(path.join(process.cwd(), options.componentsBasePath), filePath).startsWith('..')) {
                     server.ws.send({
                         type: 'full-reload',
                         path: filePath
                     })
                 }
             })
-        },
-    };
+        }
+    }
 }

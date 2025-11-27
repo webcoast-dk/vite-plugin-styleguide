@@ -12,6 +12,7 @@ export interface VariantConfig {
 
 export interface ComponentConfig {
     identifier: string
+    handle?: string
     path: string
     url: string
     label: string

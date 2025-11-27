@@ -1,8 +1,8 @@
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent } from 'vue';
 import ComponentList from './ComponentList.vue';
-import type { ComponentTree } from '../../../types/component'
 import ComponentPreview from './ComponentPreview.vue'
+import type { ComponentGroupInterface } from '../../plugin/component/componentGroup'
 
 export default defineComponent({
     name: 'App',
@@ -12,7 +12,7 @@ export default defineComponent({
     },
     data() {
         return {
-            components: {} as ComponentTree,
+            components: {} as ComponentGroupInterface,
             loading: true,
             iframeSrc: 'about:blank',
             _hmrWebSocket: null as WebSocket | null
@@ -87,7 +87,7 @@ export default defineComponent({
     </template>
     <template v-else>
         <nav class="menu">
-            <ComponentList :components="components"/>
+            <ComponentList :group="components"/>
         </nav>
         <main>
             <RouterView/>
@@ -119,6 +119,7 @@ export default defineComponent({
 .menu {
     padding: 1rem;
     position: relative;
+    overflow: auto;
 }
 
 main {
